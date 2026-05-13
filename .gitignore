@@ -1,46 +1,59 @@
-# See http://help.github.com/ignore-files/ for more about ignoring files.
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+*.iml
+*.ipr
+*.iws
+.idea/
 
-# compiled output
-/dist
-/tmp
-/out-tsc
-# Only exists if Bazel was run
-/bazel-out
+# Android
+android/local.properties
+android/.gradle
+android/captures/
+android/key.properties
+*.jks
+*.keystore
 
-# dependencies
-/node_modules
+# iOS
+ios/.symlinks
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Flutter/ephemeral/
+ios/Flutter/app.flx
+ios/Flutter/app.zip
+ios/Flutter/flutter_assets/
+ios/ServiceDefinitions.json
+ios/Runner/GeneratedPluginRegistrant.*
+Pods/
+.symlinks/
 
-# profiling files
-chrome-profiler-events*.json
-speed-measure-plugin*.json
+# macOS
+macos/Flutter/GeneratedPluginRegistrant.swift
 
-# IDEs and editors
-/.idea
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
+# Coverage
+coverage/
 
-# IDE - VSCode
+# ENV / secrets
+.env
+.env.*
+google-services.json
+GoogleService-Info.plist
+
+# IDE
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 .history/*
+*.sublime-workspace
 
-# misc
-/.sass-cache
-/connect.lock
-/coverage
-/libpeerconnection.log
-npm-debug.log
-yarn-error.log
-testem.log
-/typings
-build-storybook.log
-# System Files
+# System
 .DS_Store
 Thumbs.db
