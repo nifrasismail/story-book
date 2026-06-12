@@ -38,11 +38,13 @@ class StoryPage {
   final String emoji;
   final String text;
   final Color backgroundColor;
+  final String? imageUrl;
 
   const StoryPage({
     required this.emoji,
     required this.text,
     required this.backgroundColor,
+    this.imageUrl,
   });
 }
 
@@ -59,6 +61,46 @@ class Story {
   final Color themeColor;
   final String coverEmoji;
   final String moral;
+  final String? coverImageUrl;
+
+  factory Story.fromJson(Map<String, dynamic> json) {
+    final categoryMap = {
+      'classic': StoryCategory.classic,
+      'fable': StoryCategory.fable,
+      'fairyTale': StoryCategory.fairyTale,
+      'adventure': StoryCategory.adventure,
+    };
+
+    Color parseHex(String hex) {
+      final cleaned = hex.replaceAll('#', '');
+      return Color(int.parse('FF$cleaned', radix: 16));
+    }
+
+    return Story(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String,
+      category: categoryMap[json['category']] ?? StoryCategory.classic,
+      ageRange: json['age_range'] as String,
+      readingTimeMinutes: json['reading_time_minutes'] as int,
+      isPremium: json['is_premium'] as bool,
+      starsReward: json['stars_reward'] as int,
+      themeColor: json['theme_color'] != null
+          ? parseHex(json['theme_color'] as String)
+          : const Color(0xFF6C63FF),
+      coverEmoji: json['cover_emoji'] as String,
+      moral: json['moral'] as String,
+      coverImageUrl: json['cover_image_url'] as String?,
+      pages: (json['pages'] as List<dynamic>? ?? [])
+          .map((p) => StoryPage(
+                emoji: p['emoji'] as String,
+                text: p['text'] as String,
+                backgroundColor: parseHex(p['background_color'] as String),
+                imageUrl: p['image_url'] as String?,
+              ))
+          .toList(),
+    );
+  }
 
   const Story({
     required this.id,
@@ -73,5 +115,6 @@ class Story {
     required this.themeColor,
     required this.coverEmoji,
     required this.moral,
+    this.coverImageUrl,
   });
 }

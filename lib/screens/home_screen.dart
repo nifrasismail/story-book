@@ -229,6 +229,28 @@ class _StoryGrid extends StatelessWidget {
     final purchaseProv = context.watch<PurchaseProvider>();
     final stories = storyProv.filteredStories;
 
+    if (storyProv.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (storyProv.error != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('😕', style: TextStyle(fontSize: 60)),
+            const SizedBox(height: 12),
+            Text('Could not load stories', style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 8),
+            ElevatedButton(
+              onPressed: () => storyProv.fetchStories(),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+
     if (stories.isEmpty) {
       return Center(
         child: Column(

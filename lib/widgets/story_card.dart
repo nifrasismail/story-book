@@ -40,43 +40,31 @@ class StoryCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           child: Stack(
             children: [
-              // Background gradient
-              Container(
-                height: double.infinity,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      story.themeColor,
-                      story.themeColor.withOpacity(0.7),
-                    ],
+              // Cover image or gradient background
+              if (story.coverImageUrl != null)
+                Positioned.fill(
+                  child: Image.network(
+                    story.coverImageUrl!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => _gradientBackground(),
                   ),
-                ),
-              ),
+                )
+              else
+                Positioned.fill(child: _gradientBackground()),
 
-              // Decorative circles
-              Positioned(
-                right: -20,
-                top: -20,
-                child: Container(
-                  width: 80,
-                  height: 80,
+              // Dark gradient overlay so text is readable
+              Positioned.fill(
+                child: DecoratedBox(
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white.withOpacity(0.15),
-                  ),
-                ),
-              ),
-              Positioned(
-                right: 10,
-                bottom: -30,
-                child: Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white.withOpacity(0.1),
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withOpacity(0.65),
+                      ],
+                      stops: const [0.4, 1.0],
+                    ),
                   ),
                 ),
               ),
@@ -105,10 +93,6 @@ class StoryCard extends StatelessWidget {
 
                     const Spacer(),
 
-                    // Emoji cover
-                    Text(story.coverEmoji, style: const TextStyle(fontSize: 40)),
-                    const SizedBox(height: 6),
-
                     // Title
                     Text(
                       story.title,
@@ -119,6 +103,7 @@ class StoryCard extends StatelessWidget {
                         fontWeight: FontWeight.w900,
                         fontSize: 14,
                         height: 1.2,
+                        shadows: [Shadow(blurRadius: 4, color: Colors.black54)],
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -169,6 +154,16 @@ class StoryCard extends StatelessWidget {
         .fadeIn(duration: 300.ms)
         .slideY(begin: 0.1, end: 0, duration: 300.ms, curve: Curves.easeOut);
   }
+
+  Widget _gradientBackground() => Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [story.themeColor, story.themeColor.withOpacity(0.7)],
+          ),
+        ),
+      );
 }
 
 class _StatusBadge extends StatelessWidget {

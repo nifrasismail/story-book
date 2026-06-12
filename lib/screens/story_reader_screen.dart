@@ -24,13 +24,28 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
   late ConfettiController _confettiCtrl;
   int _currentPage = 0;
   bool _completed = false;
+  Story? _loadedStory;
+  bool _pagesLoading = true;
+
+  Story get _story => _loadedStory ?? widget.story;
 
   @override
   void initState() {
     super.initState();
     _confettiCtrl = ConfettiController(duration: const Duration(seconds: 3));
-    // Pre-load interstitial ad for later
     AdService().loadInterstitial();
+    _fetchPages();
+  }
+
+  Future<void> _fetchPages() async {
+    final provider = context.read<StoryProvider>();
+    final full = await provider.fetchStoryWithPages(widget.story.id);
+    if (mounted) {
+      setState(() {
+        _loadedStory = full;
+        _pagesLoading = false;
+      });
+    }
   }
 
   @override
@@ -42,7 +57,7 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
 
   void _onPageChanged(int page) {
     setState(() => _currentPage = page);
-    if (page == widget.story.pages.length - 1 && !_completed) {
+    if (page == _story.pages.length - 1 && !_completed) {
       _completeStory();
     }
   }
@@ -73,7 +88,7 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
   }
 
   void _nextPage() {
-    if (_currentPage < widget.story.pages.length - 1) {
+    if (_currentPage < _story.pages.length - 1) {
       _pageCtrl.nextPage(
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeInOut,
@@ -92,6 +107,14 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_pagesLoading) {
+      return Scaffold(
+        backgroundColor: _story.themeColor.withOpacity(0.1),
+        body: Center(
+          child: CircularProgressIndicator(color: _story.themeColor),
+        ),
+      );
+    }
     return Scaffold(
       body: Stack(
         children: [
@@ -99,12 +122,12 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
           PageView.builder(
             controller: _pageCtrl,
             onPageChanged: _onPageChanged,
-            itemCount: widget.story.pages.length,
+            itemCount: _story.pages.length,
             itemBuilder: (_, i) => _StoryPage(
-              page: widget.story.pages[i],
-              story: widget.story,
+              page: _story.pages[i],
+              story: _story,
               pageIndex: i,
-              totalPages: widget.story.pages.length,
+              totalPages: _story.pages.length,
             ),
           ),
 
@@ -122,7 +145,7 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
                   // Page indicator
                   SmoothPageIndicator(
                     controller: _pageCtrl,
-                    count: widget.story.pages.length,
+                    count: _story.pages.length,
                     effect: WormEffect(
                       dotColor: Colors.white54,
                       activeDotColor: widget.story.themeColor,
@@ -166,7 +189,7 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
             top: 0,
             bottom: 0,
             child: Center(
-              child: _currentPage < widget.story.pages.length - 1
+              child: _currentPage < _story.pages.length - 1
                   ? _CircleButton(
                       icon: Icons.chevron_right_rounded,
                       onTap: _nextPage,
@@ -194,7 +217,7 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
           ),
 
           // Completion banner
-          if (_completed && _currentPage == widget.story.pages.length - 1)
+          if (_completed && _currentPage == _story.pages.length - 1)
             Positioned(
               bottom: 80,
               left: 20,
@@ -261,12 +284,27 @@ class _StoryPage extends StatelessWidget {
               ),
               const SizedBox(height: 24),
 
-              // Big emoji illustration
-              Text(
-                page.emoji,
-                style: const TextStyle(fontSize: 80),
-                textAlign: TextAlign.center,
-              )
+              // Page illustration — API image if available, emoji fallback
+              (page.imageUrl != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Image.network(
+                        page.imageUrl!,
+                        height: 200,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Text(
+                          page.emoji,
+                          style: const TextStyle(fontSize: 80),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    )
+                  : Text(
+                      page.emoji,
+                      style: const TextStyle(fontSize: 80),
+                      textAlign: TextAlign.center,
+                    ))
                   .animate(key: ValueKey(pageIndex))
                   .scale(
                     begin: const Offset(0.7, 0.7),
