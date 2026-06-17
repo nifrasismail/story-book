@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../constants/app_constants.dart';
+import 'remote_config_service.dart';
 
 class AdService {
   static final AdService _instance = AdService._();
@@ -13,8 +14,11 @@ class AdService {
   InterstitialAd? _interstitialAd;
   RewardedAd? _rewardedAd;
 
+  bool get _adsEnabled => RemoteConfigService().adsEnabled;
+
   // ── Interstitial ───────────────────────────────────────────────────────────
   Future<void> loadInterstitial() async {
+    if (!_adsEnabled) return;
     final unitId = Platform.isIOS
         ? AppConstants.interstitialAdUnitIos
         : AppConstants.interstitialAdUnitAndroid;
@@ -33,7 +37,7 @@ class AdService {
   }
 
   void showInterstitial({VoidCallback? onDismissed}) {
-    if (_interstitialAd == null) {
+    if (!_adsEnabled || _interstitialAd == null) {
       onDismissed?.call();
       return;
     }
@@ -55,6 +59,7 @@ class AdService {
 
   // ── Rewarded ───────────────────────────────────────────────────────────────
   Future<void> loadRewardedAd() async {
+    if (!_adsEnabled) return;
     final unitId = Platform.isIOS
         ? AppConstants.rewardedAdUnitIos
         : AppConstants.rewardedAdUnitAndroid;
@@ -76,7 +81,7 @@ class AdService {
     required void Function(RewardItem reward) onRewarded,
     VoidCallback? onDismissed,
   }) {
-    if (_rewardedAd == null) {
+    if (!_adsEnabled || _rewardedAd == null) {
       onDismissed?.call();
       return;
     }

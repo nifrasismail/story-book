@@ -4,6 +4,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'app.dart';
 import 'services/notification_service.dart';
+import 'services/remote_config_service.dart';
 import 'services/storage_service.dart';
 
 void main() async {
@@ -22,6 +23,9 @@ void main() async {
       statusBarIconBrightness: Brightness.dark,
     ),
   );
+
+  // Fetch remote config (ads toggle, etc.)
+  await RemoteConfigService().fetch();
 
   // Initialise AdMob
   await MobileAds.instance.initialize();
