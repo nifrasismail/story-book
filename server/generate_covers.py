@@ -1,12 +1,14 @@
 """
 Run once to generate cover images for all stories via Hugging Face Inference API.
 Usage: HF_TOKEN=hf_xxx uv run python generate_covers.py
+       Generated images are saved locally AND uploaded to GCS automatically.
 """
 import json
 import os
 import time
 from pathlib import Path
 from huggingface_hub import InferenceClient
+from gcs_upload import upload_to_gcs
 
 IMAGES_DIR = Path(__file__).parent / "images"
 STORIES_FILE = Path(__file__).parent / "stories.json"
@@ -47,6 +49,7 @@ def generate(client: InferenceClient, story_id: str, prompt: str) -> bool:
         image = client.text_to_image(full_prompt, model="black-forest-labs/FLUX.1-schnell")
         image.save(str(out_path))
         print(f"  ✓ saved {story_id}.png ({out_path.stat().st_size // 1024}KB)")
+        upload_to_gcs(out_path, f"covers/{story_id}.png")
         return True
     except Exception as e:
         print(f"  ✗ failed {story_id}: {e}")

@@ -17,10 +17,9 @@
         android:usesCleartextTraffic="false"
         android:enableOnBackInvokedCallback="true">
 
-        <!-- AdMob App ID — REPLACE with your real App ID before publishing -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713"/>
+            android:value="ca-app-pub-5758697051059467~3504933645"/>
 
         <!-- AdMob delay app measurement -->
         <meta-data

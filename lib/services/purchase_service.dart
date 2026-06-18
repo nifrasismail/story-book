@@ -1,6 +1,5 @@
-import 'dart:async';
-import 'package:flutter/foundation.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
+import 'dart:io';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import '../constants/app_constants.dart';
 
 typedef PurchaseCallback = void Function(String productId, bool success);
@@ -10,78 +9,55 @@ class PurchaseService {
   factory PurchaseService() => _instance;
   PurchaseService._();
 
-  final InAppPurchase _iap = InAppPurchase.instance;
-  StreamSubscription<List<PurchaseDetails>>? _subscription;
-
   bool _isAvailable = false;
   bool get isAvailable => _isAvailable;
 
-  List<ProductDetails> _products = [];
-  List<ProductDetails> get products => _products;
-
-  PurchaseCallback? _onPurchaseResult;
-
-  static const Set<String> _productIds = {
-    AppConstants.iapPremiumPack,
-    AppConstants.iapRemoveAds,
-    AppConstants.iapBundle,
-  };
+  List<Package> _packages = [];
+  List<Package> get products => _packages;
 
   Future<void> init(PurchaseCallback onResult) async {
-    _onPurchaseResult = onResult;
-    _isAvailable = await _iap.isAvailable();
-    if (!_isAvailable) return;
-
-    _subscription = _iap.purchaseStream.listen(
-      _onPurchaseUpdate,
-      onError: (e) => debugPrint('Purchase stream error: $e'),
-    );
-
-    await _loadProducts();
-  }
-
-  Future<void> _loadProducts() async {
-    final response = await _iap.queryProductDetails(_productIds);
-    if (response.error != null) {
-      debugPrint('IAP query error: ${response.error}');
-      return;
-    }
-    _products = response.productDetails;
-  }
-
-  void _onPurchaseUpdate(List<PurchaseDetails> details) {
-    for (final purchase in details) {
-      switch (purchase.status) {
-        case PurchaseStatus.purchased:
-        case PurchaseStatus.restored:
-          _iap.completePurchase(purchase);
-          _onPurchaseResult?.call(purchase.productID, true);
-          break;
-        case PurchaseStatus.error:
-          _onPurchaseResult?.call(purchase.productID, false);
-          break;
-        default:
-          break;
+    try {
+      // Configure RevenueCat with a guest identifier until user logs in.
+      // RevenueCat requires configuration before any call.
+      final apiKey = _platformKey();
+      if (apiKey.isEmpty) return; // keys not set yet — skip in dev
+      await Purchases.configure(PurchasesConfiguration(apiKey));
+      final offerings = await Purchases.getOfferings();
+      final current = offerings.current;
+      if (current != null) {
+        _packages = current.availablePackages;
       }
+      _isAvailable = true;
+    } catch (_) {
+      _isAvailable = false;
     }
   }
 
-  Future<bool> buyProduct(String productId) async {
-    if (!_isAvailable) return false;
-    final product = _products.firstWhere(
-      (p) => p.id == productId,
+  String _platformKey() {
+    try {
+      if (AppConstants.revenueCatIosKey.startsWith('appl_REPLACE') ||
+          AppConstants.revenueCatAndroidKey.startsWith('goog_REPLACE')) {
+        return '';
+      }
+      return Platform.isIOS
+          ? AppConstants.revenueCatIosKey
+          : AppConstants.revenueCatAndroidKey;
+    } catch (_) {
+      return '';
+    }
+  }
+
+  Future<void> buyProduct(String productId) async {
+    final pkg = _packages.firstWhere(
+      (p) => p.storeProduct.identifier == productId,
       orElse: () => throw StateError('Product $productId not found'),
     );
-    final param = PurchaseParam(productDetails: product);
-    return _iap.buyNonConsumable(purchaseParam: param);
+    await Purchases.purchasePackage(pkg);
   }
 
   Future<void> restorePurchases() async {
-    if (!_isAvailable) return;
-    await _iap.restorePurchases();
+    await Purchases.restorePurchases();
   }
 
-  void dispose() {
-    _subscription?.cancel();
-  }
+  void dispose() {}
 }

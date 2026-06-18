@@ -1,0 +1,7 @@
+.venv
+__pycache__
+*.pyc
+*.pyo
+.DS_Store
+generate_covers.py
+generate_page_images.py

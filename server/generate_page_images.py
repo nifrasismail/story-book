@@ -2,6 +2,7 @@
 Run once to generate page illustrations for all stories via Hugging Face Inference API.
 Usage: HF_TOKEN=hf_xxx uv run python generate_page_images.py
        HF_TOKEN=hf_xxx uv run python generate_page_images.py --story three_little_pigs
+       Generated images are saved locally AND uploaded to GCS automatically.
 """
 import json
 import os
@@ -9,6 +10,7 @@ import sys
 import time
 from pathlib import Path
 from huggingface_hub import InferenceClient
+from gcs_upload import upload_to_gcs
 
 DATA_DIR = Path(__file__).parent / "data"
 PAGES_DIR = DATA_DIR / "pages"
@@ -226,6 +228,7 @@ def generate_page(client: InferenceClient, story_id: str, page_idx: int, prompt:
         image = client.text_to_image(full_prompt, model="black-forest-labs/FLUX.1-schnell")
         image.save(str(out_path))
         print(f"  ✓ saved page_{page_idx}.png ({out_path.stat().st_size // 1024}KB)")
+        upload_to_gcs(out_path, f"pages/{story_id}/page_{page_idx}.png")
         return True
     except Exception as e:
         print(f"  ✗ failed {story_id}/page_{page_idx}: {e}")

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../constants/app_constants.dart';
+import '../services/remote_config_service.dart';
 
 class AdBannerWidget extends StatefulWidget {
   const AdBannerWidget({super.key});
@@ -21,6 +22,7 @@ class _AdBannerWidgetState extends State<AdBannerWidget> {
   }
 
   void _loadAd() {
+    if (!RemoteConfigService().adsEnabled) return;
     final unitId = Platform.isIOS
         ? AppConstants.bannerAdUnitIos
         : AppConstants.bannerAdUnitAndroid;

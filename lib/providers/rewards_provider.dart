@@ -2,10 +2,15 @@ import 'package:flutter/foundation.dart';
 import '../models/badge_model.dart';
 import '../models/user_progress.dart';
 import '../services/storage_service.dart';
+import '../services/user_api_service.dart';
 import '../constants/app_constants.dart';
 
 class RewardsProvider extends ChangeNotifier {
   final StorageService _storage;
+  final UserApiService _api = UserApiService();
+
+  // Set after login so progress syncs to the cloud
+  String? _accessToken;
 
   RewardsProvider(this._storage) {
     _load();
@@ -21,6 +26,11 @@ class RewardsProvider extends ChangeNotifier {
   List<BadgeModel> get badges => _badges;
   int get newStarsEarned => _newStarsEarned;
   bool get leveledUp => _leveledUp;
+
+  void setAccessToken(String? token) {
+    _accessToken = token;
+    if (token != null) _syncToCloud();
+  }
 
   void _load() {
     _progress = UserProgress(
@@ -103,6 +113,7 @@ class RewardsProvider extends ChangeNotifier {
     _awardStars(starsReward);
     _checkBadges(hour: hour, isPremium: isPremium);
     notifyListeners();
+    _syncToCloud();
   }
 
   // ── Badge check ────────────────────────────────────────────────────────────
@@ -131,5 +142,21 @@ class RewardsProvider extends ChangeNotifier {
   void clearAnimationFlags() {
     _newStarsEarned = 0;
     _leveledUp = false;
+  }
+
+  // ── Cloud sync ─────────────────────────────────────────────────────────────
+  void _syncToCloud() {
+    final token = _accessToken;
+    if (token == null) return;
+    _api.syncProgress(
+      accessToken: token,
+      totalStars: _progress.totalStars,
+      currentStreak: _progress.currentStreak,
+      longestStreak: _progress.longestStreak,
+      lastReadDate: _progress.lastReadDate?.toIso8601String(),
+      completedStoryIds: _progress.completedStoryIds.toList(),
+      favouriteStoryIds: _storage.favouriteStoryIds.toList(),
+      unlockedBadgeIds: _progress.unlockedBadgeIds.toList(),
+    ).catchError((_) {}); // fire-and-forget, local storage is source of truth
   }
 }

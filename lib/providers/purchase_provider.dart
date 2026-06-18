@@ -14,10 +14,11 @@ class PurchaseProvider extends ChangeNotifier {
 
   bool _hasPremiumPack = false;
   bool _hasRemovedAds = false;
+  bool _temporaryPremium = false; // granted by rewarded ad for current session
   bool _isLoading = false;
   String? _error;
 
-  bool get hasPremiumPack => _hasPremiumPack;
+  bool get hasPremiumPack => _hasPremiumPack || _temporaryPremium;
   bool get hasRemovedAds => _hasRemovedAds;
   bool get isLoading => _isLoading;
   String? get error => _error;
@@ -66,6 +67,11 @@ class PurchaseProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  void grantTemporaryPremium() {
+    _temporaryPremium = true;
+    notifyListeners();
   }
 
   Future<void> restorePurchases() async {

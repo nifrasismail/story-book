@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../app.dart';
 import '../constants/app_colors.dart';
 import '../models/story.dart';
+import '../providers/auth_provider.dart';
+import 'auth_screen.dart';
 import '../providers/purchase_provider.dart';
 import '../providers/rewards_provider.dart';
 import '../providers/story_provider.dart';
+import '../services/ad_service.dart';
 import '../widgets/ad_banner_widget.dart';
 import '../widgets/star_counter_widget.dart';
 import '../widgets/story_card.dart';
@@ -93,7 +97,12 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final rewards = context.watch<RewardsProvider>();
+    final auth = context.watch<AuthProvider>();
     final info = rewards.progress.levelInfo;
+    final name = auth.isLoggedIn
+        ? (auth.displayName ?? auth.email?.split('@').first ?? 'Reader')
+        : 'Guest';
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
       child: Row(
@@ -102,7 +111,7 @@ class _Header extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'KidStories 📚',
+                auth.isLoggedIn ? 'Hi, $name 👋' : 'KidStories 📚',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               Text(
@@ -117,6 +126,151 @@ class _Header extends StatelessWidget {
           ),
           const Spacer(),
           StarCounterWidget(count: rewards.progress.totalStars),
+          const SizedBox(width: 4),
+          IconButton(
+            icon: CircleAvatar(
+              radius: 16,
+              backgroundColor: auth.isLoggedIn
+                  ? AppColors.primary
+                  : AppColors.textLight,
+              child: Text(
+                auth.isLoggedIn
+                    ? name.substring(0, 1).toUpperCase()
+                    : '?',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+            onPressed: () => _showProfileSheet(context, auth),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showProfileSheet(BuildContext context, AuthProvider auth) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => auth.isLoggedIn
+          ? _LoggedInSheet(auth: auth)
+          : _GuestSheet(),
+    );
+  }
+}
+
+class _LoggedInSheet extends StatelessWidget {
+  final AuthProvider auth;
+  const _LoggedInSheet({required this.auth});
+
+  @override
+  Widget build(BuildContext context) {
+    final name = auth.displayName ?? auth.email?.split('@').first ?? 'Reader';
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CircleAvatar(
+            radius: 32,
+            backgroundColor: AppColors.primary,
+            child: Text(
+              name.substring(0, 1).toUpperCase(),
+              style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Text(auth.email ?? '', style: TextStyle(color: AppColors.textMedium, fontSize: 13)),
+          const SizedBox(height: 8),
+          const Text(
+            '✅ Progress synced to cloud',
+            style: TextStyle(color: Colors.green, fontSize: 13, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              icon: const Icon(Icons.logout_rounded, color: Colors.red),
+              label: const Text('Logout', style: TextStyle(color: Colors.red)),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Colors.red),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+              onPressed: () async {
+                Navigator.pop(context);
+                await auth.logout();
+              },
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+}
+
+class _GuestSheet extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text('📚', style: TextStyle(fontSize: 48)),
+          const SizedBox(height: 12),
+          const Text(
+            'Save Your Progress',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Create a free account to sync your stars, streaks and badges across all your devices.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: AppColors.textMedium, fontSize: 14),
+          ),
+          const SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AuthScreen()),
+                );
+              },
+              child: const Text('Create Free Account', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AuthScreen()),
+                );
+              },
+              child: const Text('Already have an account? Sign In'),
+            ),
+          ),
+          const SizedBox(height: 8),
         ],
       ),
     );
@@ -314,27 +468,50 @@ class _StoryGrid extends StatelessWidget {
   }
 
   void _showLockedDialog(BuildContext context) {
+    final adService = AdService();
+    adService.loadRewardedAd();
+
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: const Text('💎 Premium Story', textAlign: TextAlign.center),
         content: const Text(
-          'This is a premium story. Unlock all premium stories to enjoy endless magical adventures!',
+          'Watch a short video to unlock all premium stories for free — or come back anytime!',
           textAlign: TextAlign.center,
         ),
         actionsAlignment: MainAxisAlignment.center,
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(ctx),
             child: const Text('Maybe Later'),
           ),
-          ElevatedButton(
+          ElevatedButton.icon(
+            icon: const Icon(Icons.play_circle_fill_rounded, color: Colors.white),
+            label: const Text('Watch Ad — Free!',
+                style: TextStyle(color: Colors.white)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
             onPressed: () {
-              Navigator.pop(context);
-              // Navigate to store via bottom nav — simple approach
+              Navigator.pop(ctx);
+              adService.showRewardedAd(
+                onRewarded: (_) {
+                  context.read<PurchaseProvider>().grantTemporaryPremium();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                          '🎉 Premium stories unlocked! Enjoy reading!'),
+                      backgroundColor: Colors.green,
+                      duration: Duration(seconds: 3),
+                    ),
+                  );
+                },
+                onDismissed: () {},
+              );
             },
-            child: const Text('Unlock Now ✨'),
           ),
         ],
       ),

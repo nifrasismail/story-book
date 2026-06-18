@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StorageService {
@@ -78,4 +77,33 @@ class StorageService {
   // ── Onboarding ─────────────────────────────────────────────────────────────
   bool get isFirstLaunch => _prefs.getBool('is_first_launch') ?? true;
   Future<void> setFirstLaunch(bool v) => _prefs.setBool('is_first_launch', v);
+
+  // ── Auth session ───────────────────────────────────────────────────────────
+  String? get accessToken => _prefs.getString('access_token');
+  String? get refreshToken => _prefs.getString('refresh_token');
+  String? get userId => _prefs.getString('user_id');
+  String? get userEmail => _prefs.getString('user_email');
+  String? get displayName => _prefs.getString('display_name');
+
+  Future<void> saveSession({
+    required String accessToken,
+    required String refreshToken,
+    required String userId,
+    required String email,
+    String? displayName,
+  }) async {
+    await _prefs.setString('access_token', accessToken);
+    await _prefs.setString('refresh_token', refreshToken);
+    await _prefs.setString('user_id', userId);
+    await _prefs.setString('user_email', email);
+    if (displayName != null) await _prefs.setString('display_name', displayName);
+  }
+
+  Future<void> clearSession() async {
+    await _prefs.remove('access_token');
+    await _prefs.remove('refresh_token');
+    await _prefs.remove('user_id');
+    await _prefs.remove('user_email');
+    await _prefs.remove('display_name');
+  }
 }

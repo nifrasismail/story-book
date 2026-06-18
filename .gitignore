@@ -57,3 +57,6 @@ GoogleService-Info.plist
 # System
 .DS_Store
 Thumbs.db
+
+# Release secrets
+secrets/

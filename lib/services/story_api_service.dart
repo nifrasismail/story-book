@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/story.dart';
+import '../constants/app_constants.dart';
 
 class StoryApiService {
-  // Use 10.0.2.2 for Android emulator, 127.0.0.1 for iOS simulator
-  static const String _baseUrl = 'http://127.0.0.1:8000';
+  static const String _baseUrl = AppConstants.apiBaseUrl;
 
   Future<List<Story>> fetchStories() async {
     final response = await http.get(Uri.parse('$_baseUrl/stories/'));
