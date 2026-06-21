@@ -142,12 +142,6 @@ _PRIVACY_HTML = """<!DOCTYPE html>
   </div>
 
   <div class="card">
-    <h2>💳 In-App Purchases</h2>
-    <p>KidStories offers optional in-app purchases (Premium Stories Pack, Remove Ads) processed entirely by <strong>Google Play</strong> and managed by <strong>RevenueCat</strong>. We do not store or process payment card details ourselves.</p>
-    <p>Parents are encouraged to enable purchase authentication in their device settings to prevent unintended purchases.</p>
-  </div>
-
-  <div class="card">
     <h2>🔔 Notifications</h2>
     <p>With your permission, KidStories sends a daily reminder to read a bedtime story. You can disable notifications at any time from your device's Settings &rarr; Apps &rarr; KidStories &rarr; Notifications.</p>
   </div>
