@@ -115,12 +115,13 @@ _PRIVACY_HTML = """<!DOCTYPE html>
 
   <div class="card">
     <h2>🔍 Information We Collect</h2>
-    <p><strong>We do not collect any personally identifiable information from children.</strong> Specifically, we do not collect names, email addresses, phone numbers, photos, or location data.</p>
+    <p><strong>We do not collect any personally identifiable information from children.</strong> We do not collect children's names, phone numbers, photos, or location data.</p>
+    <p>If a parent or guardian creates an optional account, we collect their <strong>email address</strong> and chosen <strong>display name</strong> solely for authentication and progress sync. See the Account &amp; Registration section below.</p>
     <p>We may collect the following non-personal, anonymous data to improve the app:</p>
     <ul>
       <li>App crash reports and performance diagnostics (via Firebase Crashlytics)</li>
       <li>Anonymous usage analytics such as screens viewed and stories read (via Firebase Analytics)</li>
-      <li>In-app purchase records processed securely by Google Play and RevenueCat</li>
+      <li>Account information you provide when registering (email address and display name)</li>
     </ul>
   </div>
 
@@ -128,7 +129,7 @@ _PRIVACY_HTML = """<!DOCTYPE html>
     <h2>📖 How We Use Information</h2>
     <ul>
       <li>To deliver and improve the story content and app experience</li>
-      <li>To process purchases and restore entitlements</li>
+      <li>To create and manage your account and sync your reading progress across devices</li>
       <li>To send optional daily reading reminder notifications (can be disabled in device settings)</li>
       <li>To detect and fix technical issues</li>
     </ul>
@@ -147,8 +148,19 @@ _PRIVACY_HTML = """<!DOCTYPE html>
   </div>
 
   <div class="card">
+    <h2>👤 Account &amp; Registration</h2>
+    <p>KidStories offers an optional account system for parents. When you register, we collect your <strong>email address</strong> and a <strong>display name</strong>. This information is used to:</p>
+    <ul>
+      <li>Authenticate you securely when signing in</li>
+      <li>Sync your child's reading progress and earned stars across devices</li>
+    </ul>
+    <p>Account registration is optional. The app is fully usable without an account; progress is stored locally on the device. You can delete your account and all associated data at any time by contacting us at <a href="mailto:nifrasismail@gmail.com">nifrasismail@gmail.com</a>.</p>
+    <p>Passwords are never stored in plain text. Authentication is handled securely via <a href="https://supabase.com/privacy" target="_blank">Supabase</a>.</p>
+  </div>
+
+  <div class="card">
     <h2>🔒 Data Security</h2>
-    <p>All communication between the app and our servers is encrypted using HTTPS/TLS. We do not store any personal information on our servers. Story content and anonymous analytics are the only data handled by our backend.</p>
+    <p>All communication between the app and our servers is encrypted using HTTPS/TLS. Account credentials are handled by Supabase with industry-standard security practices. Anonymous analytics and story content are the only other data handled by our backend.</p>
   </div>
 
   <div class="card">
@@ -168,8 +180,7 @@ _PRIVACY_HTML = """<!DOCTYPE html>
     <ul>
       <li><a href="https://policies.google.com/privacy" target="_blank">Google AdMob</a> &mdash; child-directed ad serving</li>
       <li><a href="https://firebase.google.com/support/privacy" target="_blank">Firebase Analytics &amp; Crashlytics</a> &mdash; anonymous analytics and crash reporting</li>
-      <li><a href="https://www.revenuecat.com/privacy" target="_blank">RevenueCat</a> &mdash; in-app purchase management</li>
-      <li><a href="https://supabase.com/privacy" target="_blank">Supabase</a> &mdash; backend infrastructure</li>
+<li><a href="https://supabase.com/privacy" target="_blank">Supabase</a> &mdash; backend infrastructure</li>
     </ul>
   </div>
 
