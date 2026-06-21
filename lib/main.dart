@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'app.dart';
+import 'services/network_service.dart';
 import 'services/notification_service.dart';
 import 'services/remote_config_service.dart';
 import 'services/storage_service.dart';
@@ -33,6 +34,9 @@ void main() async {
   // Initialise persistent storage
   final storageService = StorageService();
   await storageService.init();
+
+  // Start connectivity monitoring
+  await NetworkService().init();
 
   // Schedule daily story reminder notification
   final notificationService = NotificationService();
