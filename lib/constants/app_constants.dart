@@ -1,6 +1,7 @@
 class AppConstants {
   // API
   static const String apiBaseUrl = 'https://kidstories-api-412437962167.us-central1.run.app';
+  // For local dev use: 'http://10.0.2.2:8080' (Android emulator)
   // For local dev use: 'http://10.0.2.2:8000' (Android) or 'http://localhost:8000' (iOS sim)
 
 

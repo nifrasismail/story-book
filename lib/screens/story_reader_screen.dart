@@ -26,6 +26,7 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
   bool _completed = false;
   Story? _loadedStory;
   bool _pagesLoading = true;
+  bool _pagesFailed = false;
 
   Story get _story => _loadedStory ?? widget.story;
 
@@ -38,12 +39,14 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
   }
 
   Future<void> _fetchPages() async {
+    if (mounted) setState(() { _pagesLoading = true; _pagesFailed = false; });
     final provider = context.read<StoryProvider>();
     final full = await provider.fetchStoryWithPages(widget.story.id);
     if (mounted) {
       setState(() {
         _loadedStory = full;
         _pagesLoading = false;
+        _pagesFailed = full == null || full.pages.isEmpty;
       });
     }
   }
@@ -87,23 +90,6 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
     }
   }
 
-  void _nextPage() {
-    if (_currentPage < _story.pages.length - 1) {
-      _pageCtrl.nextPage(
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.easeInOut,
-      );
-    }
-  }
-
-  void _prevPage() {
-    if (_currentPage > 0) {
-      _pageCtrl.previousPage(
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.easeInOut,
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,6 +98,30 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
         backgroundColor: _story.themeColor.withValues(alpha: 0.1),
         body: Center(
           child: CircularProgressIndicator(color: _story.themeColor),
+        ),
+      );
+    }
+    if (_pagesFailed) {
+      return Scaffold(
+        backgroundColor: _story.themeColor.withValues(alpha: 0.1),
+        appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('😕', style: TextStyle(fontSize: 60)),
+                const SizedBox(height: 16),
+                Text('Could not load story', style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: _fetchPages,
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          ),
         ),
       );
     }
@@ -167,34 +177,6 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
                   ),
                 ],
               ),
-            ),
-          ),
-
-          // Navigation arrows (sides)
-          Positioned(
-            left: 8,
-            top: 0,
-            bottom: 0,
-            child: Center(
-              child: _currentPage > 0
-                  ? _CircleButton(
-                      icon: Icons.chevron_left_rounded,
-                      onTap: _prevPage,
-                    )
-                  : const SizedBox(width: 40),
-            ),
-          ),
-          Positioned(
-            right: 8,
-            top: 0,
-            bottom: 0,
-            child: Center(
-              child: _currentPage < _story.pages.length - 1
-                  ? _CircleButton(
-                      icon: Icons.chevron_right_rounded,
-                      onTap: _nextPage,
-                    )
-                  : const SizedBox(width: 40),
             ),
           ),
 

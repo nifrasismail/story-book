@@ -42,13 +42,25 @@ class KidStoriesApp extends StatelessWidget {
   }
 }
 
-class _Root extends StatelessWidget {
+class _Root extends StatefulWidget {
   const _Root();
+
+  @override
+  State<_Root> createState() => _RootState();
+}
+
+class _RootState extends State<_Root> {
+  bool _seenOnline = false;
 
   @override
   Widget build(BuildContext context) {
     final isOnline = context.watch<NetworkService>().isOnline;
-    if (!isOnline) return const _NoInternetScreen();
+    if (isOnline) _seenOnline = true;
+
+    // Show offline screen only before the app has ever come online.
+    // Once the user reaches the app, connectivity changes are handled
+    // inside each screen (StoryProvider shows a retry button, etc.)
+    if (!_seenOnline) return const _NoInternetScreen();
     return const SplashScreen();
   }
 }
