@@ -30,7 +30,7 @@ class StoryCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: story.themeColor.withOpacity(0.3),
+              color: story.themeColor.withValues(alpha: 0.3),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),
@@ -61,7 +61,7 @@ class StoryCard extends StatelessWidget {
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.transparent,
-                        Colors.black.withOpacity(0.65),
+                        Colors.black.withValues(alpha: 0.65),
                       ],
                       stops: const [0.4, 1.0],
                     ),
@@ -160,7 +160,7 @@ class StoryCard extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [story.themeColor, story.themeColor.withOpacity(0.7)],
+            colors: [story.themeColor, story.themeColor.withValues(alpha: 0.7)],
           ),
         ),
       );

@@ -123,7 +123,7 @@ class RewardsProvider extends ChangeNotifier {
 
     void tryUnlock(String id) => unlocked.add(id);
 
-    if (completed.length >= 1) tryUnlock('first_story');
+    if (completed.isNotEmpty) tryUnlock('first_story');
     if (completed.length >= 5) tryUnlock('bookworm');
     if (completed.length >= 10) tryUnlock('story_star');
     if (completed.length >= 20) tryUnlock('master_reader');

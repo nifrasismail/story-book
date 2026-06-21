@@ -68,6 +68,7 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
 
     final rewards = context.read<RewardsProvider>();
     final storyProv = context.read<StoryProvider>();
+    final purchase = context.read<PurchaseProvider>();
     final hour = DateTime.now().hour;
 
     await rewards.onStoryCompleted(
@@ -81,7 +82,6 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
     NotificationService().showStoryCompletedNotification(widget.story.title);
 
     // Show interstitial after free stories
-    final purchase = context.read<PurchaseProvider>();
     if (!purchase.hasRemovedAds && !widget.story.isPremium) {
       AdService().showInterstitial();
     }
@@ -109,7 +109,7 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
   Widget build(BuildContext context) {
     if (_pagesLoading) {
       return Scaffold(
-        backgroundColor: _story.themeColor.withOpacity(0.1),
+        backgroundColor: _story.themeColor.withValues(alpha: 0.1),
         body: Center(
           child: CircularProgressIndicator(color: _story.themeColor),
         ),
@@ -268,7 +268,7 @@ class _StoryPage extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: story.themeColor.withOpacity(0.15),
+                      color: story.themeColor.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
@@ -374,7 +374,7 @@ class _CompletionBanner extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withValues(alpha: 0.15),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -403,7 +403,7 @@ class _CompletionBanner extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: AppColors.gold.withOpacity(0.2),
+                color: AppColors.gold.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(

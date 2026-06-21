@@ -12,7 +12,7 @@ class StarCounterWidget extends StatelessWidget {
     Widget badge = Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.gold.withOpacity(0.2),
+        color: AppColors.gold.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.gold, width: 1.5),
       ),

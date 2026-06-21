@@ -20,7 +20,7 @@ class BadgeWidget extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: badge.isUnlocked
-                  ? AppColors.gold.withOpacity(0.15)
+                  ? AppColors.gold.withValues(alpha: 0.15)
                   : Colors.grey.shade200,
               border: Border.all(
                 color: badge.isUnlocked ? AppColors.gold : Colors.grey.shade300,
@@ -29,7 +29,7 @@ class BadgeWidget extends StatelessWidget {
               boxShadow: badge.isUnlocked
                   ? [
                       BoxShadow(
-                        color: AppColors.gold.withOpacity(0.3),
+                        color: AppColors.gold.withValues(alpha: 0.3),
                         blurRadius: 10,
                         spreadRadius: 2,
                       )

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../app.dart';
 import '../constants/app_colors.dart';
 import '../models/story.dart';
 import '../providers/auth_provider.dart';
@@ -49,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onDestinationSelected: (i) => setState(() => _navIndex = i),
             backgroundColor: Colors.white,
             elevation: 10,
-            indicatorColor: AppColors.primary.withOpacity(0.15),
+            indicatorColor: AppColors.primary.withValues(alpha: 0.15),
             destinations: const [
               NavigationDestination(
                 icon: Icon(Icons.auto_stories_outlined),
@@ -352,7 +351,7 @@ class _CategoryFilter extends StatelessWidget {
                   boxShadow: [
                     BoxShadow(
                       color: isSelected
-                          ? AppColors.primary.withOpacity(0.3)
+                          ? AppColors.primary.withValues(alpha: 0.3)
                           : Colors.black12,
                       blurRadius: 6,
                       offset: const Offset(0, 2),

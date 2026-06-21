@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../constants/app_colors.dart';
 import '../app.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -59,7 +58,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
+                      color: Colors.black.withValues(alpha: 0.2),
                       blurRadius: 30,
                       spreadRadius: 5,
                     ),
@@ -153,8 +152,7 @@ class _FloatingEmojis extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: List.generate(items.length, (i) {
-          final angle = i * 45.0;
-          final radius = 180.0;
+          const radius = 180.0;
           final x = radius * (i % 2 == 0 ? 1 : -1) * (0.5 + (i * 0.1));
           final y = -120.0 - (i * 30.0);
           return Positioned(
