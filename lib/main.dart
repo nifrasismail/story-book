@@ -11,13 +11,11 @@ import 'services/storage_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Lock portrait orientation for a better reading experience
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
-  // Status bar style
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -25,23 +23,15 @@ void main() async {
     ),
   );
 
-  // Fetch remote config (ads toggle, etc.)
-  await RemoteConfigService().fetch();
-
-  // Initialise AdMob
-  await MobileAds.instance.initialize();
-
-  // Initialise persistent storage
+  // Only storage is required before runApp — everything else runs in background
   final storageService = StorageService();
   await storageService.init();
 
-  // Start connectivity monitoring
-  await NetworkService().init();
-
-  // Schedule daily story reminder notification
-  final notificationService = NotificationService();
-  await notificationService.init();
-  await notificationService.scheduleDailyReminder();
-
   runApp(KidStoriesApp(storageService: storageService));
+
+  // Non-critical services initialised after the first frame is rendered
+  RemoteConfigService().fetch();
+  MobileAds.instance.initialize();
+  NetworkService().init();
+  NotificationService().init().then((_) => NotificationService().scheduleDailyReminder());
 }

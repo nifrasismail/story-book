@@ -76,30 +76,16 @@ class NotificationService {
       presentSound: true,
     );
 
-    try {
-      await _plugin.zonedSchedule(
-        AppConstants.notificationId,
-        '📖 Story Time!',
-        'A new adventure is waiting for you! Come read a story tonight ✨',
-        scheduled,
-        const NotificationDetails(android: androidDetails, iOS: iosDetails),
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents: DateTimeComponents.time,
-      );
-    } catch (_) {
-      // Exact alarms not permitted on this device — fall back to inexact
-      await _plugin.zonedSchedule(
-        AppConstants.notificationId,
-        '📖 Story Time!',
-        'A new adventure is waiting for you! Come read a story tonight ✨',
-        scheduled,
-        const NotificationDetails(android: androidDetails, iOS: iosDetails),
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents: DateTimeComponents.time,
-      );
-    }
+    await _plugin.zonedSchedule(
+      AppConstants.notificationId,
+      '📖 Story Time!',
+      'A new adventure is waiting for you! Come read a story tonight ✨',
+      scheduled,
+      const NotificationDetails(android: androidDetails, iOS: iosDetails),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.time,
+    );
   }
 
   Future<void> showStoryCompletedNotification(String storyTitle) async {
