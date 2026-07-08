@@ -32,6 +32,13 @@ void main() async {
   // Non-critical services initialised after the first frame is rendered
   RemoteConfigService().fetch();
   MobileAds.instance.initialize();
+  MobileAds.instance.updateRequestConfiguration(
+    RequestConfiguration(
+      tagForChildDirectedTreatment: TagForChildDirectedTreatment.yes,
+      tagForUnderAgeOfConsent: TagForUnderAgeOfConsent.yes,
+      maxAdContentRating: MaxAdContentRating.g,
+    ),
+  );
   NetworkService().init();
   NotificationService().init().then((_) => NotificationService().scheduleDailyReminder());
 }

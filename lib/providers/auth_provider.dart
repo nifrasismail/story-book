@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import '../services/auth_api_service.dart';
-import '../services/revenuecat_service.dart';
 import '../services/storage_service.dart';
 
 class AuthProvider extends ChangeNotifier {
@@ -98,9 +97,6 @@ class AuthProvider extends ChangeNotifier {
       email: _email!,
       displayName: _displayName,
     );
-    // Identify this user in RevenueCat using Supabase user ID
-    // so webhook events match the correct Supabase row
-    RevenueCatService.configure(_userId!).catchError((_) {});
   }
 
   Future<void> _run(Future<void> Function() fn) async {
