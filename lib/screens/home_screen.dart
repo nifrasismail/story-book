@@ -4,11 +4,8 @@ import '../constants/app_colors.dart';
 import '../models/story.dart';
 import '../providers/auth_provider.dart';
 import 'auth_screen.dart';
-import '../providers/purchase_provider.dart';
 import '../providers/rewards_provider.dart';
 import '../providers/story_provider.dart';
-import '../services/ad_service.dart';
-import '../widgets/ad_banner_widget.dart';
 import '../widgets/star_counter_widget.dart';
 import '../widgets/story_card.dart';
 import 'rewards_screen.dart';
@@ -38,11 +35,6 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Banner ad for free users
-          Consumer<PurchaseProvider>(
-            builder: (_, p, __) =>
-                p.hasRemovedAds ? const SizedBox.shrink() : const AdBannerWidget(),
-          ),
           NavigationBar(
             selectedIndex: _navIndex,
             onDestinationSelected: (i) => setState(() => _navIndex = i),
@@ -379,7 +371,6 @@ class _StoryGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final storyProv = context.watch<StoryProvider>();
-    final purchaseProv = context.watch<PurchaseProvider>();
     final stories = storyProv.filteredStories;
 
     if (storyProv.isLoading) {
@@ -431,89 +422,32 @@ class _StoryGrid extends StatelessWidget {
       itemCount: stories.length,
       itemBuilder: (ctx, i) {
         final story = stories[i];
-        final isLocked = story.isPremium && !purchaseProv.hasPremiumPack;
         return StoryCard(
           story: story,
           isCompleted: storyProv.isCompleted(story.id),
           isFavourite: storyProv.isFavourite(story.id),
-          isLocked: isLocked,
+          isLocked: false,
           onFavouriteTap: () => storyProv.toggleFavourite(story.id),
           onTap: () {
-            if (isLocked) {
-              _showLockedDialog(ctx);
-            } else {
-              Navigator.push(
-                ctx,
-                PageRouteBuilder(
-                  pageBuilder: (_, __, ___) => StoryReaderScreen(story: story),
-                  transitionsBuilder: (_, anim, __, child) =>
-                      SlideTransition(
-                        position: Tween<Offset>(
-                          begin: const Offset(1, 0),
-                          end: Offset.zero,
-                        ).animate(
-                          CurvedAnimation(parent: anim, curve: Curves.easeOut),
-                        ),
-                        child: child,
-                      ),
-                  transitionDuration: const Duration(milliseconds: 400),
+            Navigator.push(
+              ctx,
+              PageRouteBuilder(
+                pageBuilder: (_, __, ___) => StoryReaderScreen(story: story),
+                transitionsBuilder: (_, anim, __, child) => SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(1, 0),
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(parent: anim, curve: Curves.easeOut),
+                  ),
+                  child: child,
                 ),
-              );
-            }
+                transitionDuration: const Duration(milliseconds: 400),
+              ),
+            );
           },
         );
       },
-    );
-  }
-
-  void _showLockedDialog(BuildContext context) {
-    final adService = AdService();
-    adService.loadRewardedAd();
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Text('💎 Premium Story', textAlign: TextAlign.center),
-        content: const Text(
-          'Watch a short video to unlock all premium stories for free — or come back anytime!',
-          textAlign: TextAlign.center,
-        ),
-        actionsAlignment: MainAxisAlignment.center,
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Maybe Later'),
-          ),
-          ElevatedButton.icon(
-            icon: const Icon(Icons.play_circle_fill_rounded, color: Colors.white),
-            label: const Text('Watch Ad — Free!',
-                style: TextStyle(color: Colors.white)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-            ),
-            onPressed: () {
-              Navigator.pop(ctx);
-              adService.showRewardedAd(
-                onRewarded: (_) {
-                  context.read<PurchaseProvider>().grantTemporaryPremium();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                          '🎉 Premium stories unlocked! Enjoy reading!'),
-                      backgroundColor: Colors.green,
-                      duration: Duration(seconds: 3),
-                    ),
-                  );
-                },
-                onDismissed: () {},
-              );
-            },
-          ),
-        ],
-      ),
     );
   }
 }

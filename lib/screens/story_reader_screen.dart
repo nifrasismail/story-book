@@ -7,9 +7,7 @@ import '../constants/app_colors.dart';
 import '../models/story.dart';
 import '../providers/rewards_provider.dart';
 import '../providers/story_provider.dart';
-import '../services/ad_service.dart';
 import '../services/notification_service.dart';
-import '../providers/purchase_provider.dart';
 
 class StoryReaderScreen extends StatefulWidget {
   final Story story;
@@ -34,7 +32,6 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
   void initState() {
     super.initState();
     _confettiCtrl = ConfettiController(duration: const Duration(seconds: 3));
-    AdService().loadInterstitial();
     _fetchPages();
   }
 
@@ -71,7 +68,6 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
 
     final rewards = context.read<RewardsProvider>();
     final storyProv = context.read<StoryProvider>();
-    final purchase = context.read<PurchaseProvider>();
     final hour = DateTime.now().hour;
 
     await rewards.onStoryCompleted(
@@ -83,11 +79,6 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
     await storyProv.markCompleted(widget.story.id);
 
     NotificationService().showStoryCompletedNotification(widget.story.title);
-
-    // Show interstitial after free stories
-    if (!purchase.hasRemovedAds && !widget.story.isPremium) {
-      AdService().showInterstitial();
-    }
   }
 
 

@@ -22,15 +22,6 @@
             android:name="io.flutter.embedding.android.EnableImpeller"
             android:value="false" />
 
-        <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-5758697051059467~3504933645"/>
-
-        <!-- AdMob delay app measurement -->
-        <meta-data
-            android:name="com.google.android.gms.ads.DELAY_APP_MEASUREMENT_INIT"
-            android:value="true"/>
-
         <activity
             android:name=".MainActivity"
             android:exported="true"

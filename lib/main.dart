@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'app.dart';
 import 'services/network_service.dart';
 import 'services/notification_service.dart';
-import 'services/remote_config_service.dart';
 import 'services/storage_service.dart';
 
 void main() async {
@@ -30,15 +28,6 @@ void main() async {
   runApp(KidStoriesApp(storageService: storageService));
 
   // Non-critical services initialised after the first frame is rendered
-  RemoteConfigService().fetch();
-  MobileAds.instance.initialize();
-  MobileAds.instance.updateRequestConfiguration(
-    RequestConfiguration(
-      tagForChildDirectedTreatment: TagForChildDirectedTreatment.yes,
-      tagForUnderAgeOfConsent: TagForUnderAgeOfConsent.yes,
-      maxAdContentRating: MaxAdContentRating.g,
-    ),
-  );
   NetworkService().init();
   NotificationService().init().then((_) => NotificationService().scheduleDailyReminder());
 }

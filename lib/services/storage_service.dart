@@ -62,18 +62,6 @@ class StorageService {
   Future<void> setUnlockedBadgeIds(Set<String> ids) =>
       _prefs.setStringList('unlocked_badges', ids.toList());
 
-  // ── IAP ────────────────────────────────────────────────────────────────────
-  bool get hasPremiumPack => _prefs.getBool('has_premium_pack') ?? false;
-  Future<void> setHasPremiumPack(bool v) => _prefs.setBool('has_premium_pack', v);
-
-  bool get hasRemovedAds => _prefs.getBool('has_removed_ads') ?? false;
-  Future<void> setHasRemovedAds(bool v) => _prefs.setBool('has_removed_ads', v);
-
-  // ── Interstitial counter ──────────────────────────────────────────────────
-  int get storiesReadSinceAd => _prefs.getInt('stories_read_since_ad') ?? 0;
-  Future<void> setStoriesReadSinceAd(int v) =>
-      _prefs.setInt('stories_read_since_ad', v);
-
   // ── Onboarding ─────────────────────────────────────────────────────────────
   bool get isFirstLaunch => _prefs.getBool('is_first_launch') ?? true;
   Future<void> setFirstLaunch(bool v) => _prefs.setBool('is_first_launch', v);
