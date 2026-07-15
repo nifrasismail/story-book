@@ -1,12 +1,12 @@
 name: kidstories
 description: A magical storybook app for kids — stories, rewards, and adventures!
 
-publish_to: 'none'
+publish_to: "none"
 
-version: 1.0.0+17
+version: 1.0.19+19
 
 environment:
-  sdk: '>=3.3.0 <4.0.0'
+  sdk: ">=3.3.0 <4.0.0"
 
 dependencies:
   flutter:
